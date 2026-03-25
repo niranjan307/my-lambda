@@ -45,7 +45,7 @@ jobs:
           aws-region: ${{ github.event.inputs.region || 'us-east-1' }}
 
       - name: Upload to S3
-        run: aws s3 cp my-lambda.zip s3://my-s3-bucket-${AWS::Region}-${AWS::AccountId}/artifacts/
+        run: aws s3 cp my-lambda.zip s3://my-s3-bucket-us-east-1-042470866308/artifacts/
 
       - name: Deploy CloudFormation stack
         run: |
