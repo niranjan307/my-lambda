@@ -1,5 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Lambda function with IAM role and S3 trigger (prefix filter)
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda function with IAM role and S3 trigger (prefix + suffix filter)
 
 Resources:
   MyLambdaRole:
@@ -17,23 +18,27 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
 
   MyLambdaFunction:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: my-lambda-learning-function
       Runtime: python3.12
       Handler: main.lambda_handler
       Role: !GetAtt MyLambdaRole.Arn
-      Code:
-        S3Bucket: !Sub my-s3-bucket-${AWS::Region}-${AWS::AccountId}
-        S3Key: artifacts/my-lambda.zip
-
-  MyLambdaPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !Ref MyLambdaFunction
-      Action: lambda:InvokeFunction
-      Principal: s3.amazonaws.com
-      SourceArn: !Sub arn:aws:s3:::my-s3-bucket-${AWS::Region}-${AWS::AccountId}
+      CodeUri: ./src   # local source folder (SAM style)
+      Events:
+        S3Trigger:
+          Type: S3
+          Properties:
+            Bucket: !Sub my-s3-bucket-${AWS::Region}-${AWS::AccountId}
+            Events:
+              - s3:ObjectCreated:Put
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: inbound/
+                  - Name: suffix
+                    Value: .json
 
 Outputs:
   LambdaArn:
