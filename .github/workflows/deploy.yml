@@ -52,5 +52,5 @@ jobs:
           aws cloudformation deploy \
             --template-file lambda.yml \
             --stack-name my-lambda-stack \
-            --capabilities CAPABILITY_IAM \
+            --capabilities CAPABILITY_NAMED_IAM \
             --region ${{ github.event.inputs.region || 'us-east-1' }}
