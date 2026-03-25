@@ -16,10 +16,17 @@ on:
           - us-east-1
           - us-west-2
           - ap-south-1
+      bucketName:
+        description: "S3 bucket name for artifacts"
+        required: true
+        default: my-s3-bucket-us-east-1-042470866308
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      # Default bucket for push events
+      BUCKET_NAME: my-s3-bucket-us-east-1-042470866308
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -45,7 +52,7 @@ jobs:
           aws-region: ${{ github.event.inputs.region || 'us-east-1' }}
 
       - name: Upload to S3
-        run: aws s3 cp my-lambda.zip s3://my-s3-bucket-us-east-1-042470866308/artifacts/
+        run: aws s3 cp my-lambda.zip s3://my-s3-bucket-${{ github.event.inputs.region || 'us-east-1' }}-${{ secrets.AWS_ACCOUNT_ID }}/artifacts/
 
       - name: Deploy CloudFormation stack
         run: |
@@ -53,4 +60,6 @@ jobs:
             --template-file lambda.yml \
             --stack-name my-lambda-stack \
             --capabilities CAPABILITY_NAMED_IAM \
-            --region ${{ github.event.inputs.region || 'us-east-1' }}
+            --region ${{ github.event.inputs.region || 'us-east-1' }} \
+            --parameter-overrides \
+              ArtifactBucketName=${{ github.event.inputs.bucketName || env.BUCKET_NAME }}
