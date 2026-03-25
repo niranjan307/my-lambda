@@ -52,7 +52,14 @@ jobs:
           aws-region: ${{ github.event.inputs.region || 'us-east-1' }}
 
       - name: Upload to S3
-        run: aws s3 cp my-lambda.zip s3://my-s3-bucket-${{ github.event.inputs.region || 'us-east-1' }}-${{ secrets.AWS_ACCOUNT_ID }}/artifacts/
+        id: upload
+        run: |
+          VERSION_ID=$(aws s3api put-object \
+            --bucket my-s3-bucket-${{ github.event.inputs.region || 'us-east-1' }}-${{ secrets.AWS_ACCOUNT_ID }} \
+            --key artifacts/my-lambda.zip \
+            --body my-lambda.zip \
+            --query VersionId --output text)
+          echo "VERSION_ID=$VERSION_ID" >> $GITHUB_ENV
 
       - name: Deploy CloudFormation stack
         run: |
@@ -62,4 +69,7 @@ jobs:
             --capabilities CAPABILITY_NAMED_IAM \
             --region ${{ github.event.inputs.region || 'us-east-1' }} \
             --parameter-overrides \
-              ArtifactBucketName=${{ github.event.inputs.bucketName || env.BUCKET_NAME }}
+              ArtifactBucketName=${{ github.event.inputs.bucketName || env.BUCKET_NAME }} \
+              ArtifactKey=artifacts/my-lambda.zip \
+              ArtifactVersionId=$VERSION_ID
+

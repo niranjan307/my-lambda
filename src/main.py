@@ -24,7 +24,9 @@ def lambda_handler(event, context):
         # Parse JSON file content
         data = json.loads(file_content)
 
-        # Print name and age
-        print(f"Name: {data.get('name')}, Age: {data.get('age')}")
+        for item in data:
+            name = item.get("name")
+            age = item.get("age")
+            print(f"Name: {name}, Age: {age}")
 
     return {"statusCode": 200, "body": "File processed!"}
