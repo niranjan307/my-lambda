@@ -24,23 +24,8 @@ Resources:
       Handler: main.lambda_handler
       Role: !GetAtt MyLambdaRole.Arn
       Code:
-        S3Bucket: my-s3-bucket-us-east-1-042470866308   # <-- hard-coded bucket name
+        S3Bucket: !Sub my-s3-bucket-${AWS::Region}-${AWS::AccountId}
         S3Key: artifacts/my-lambda.zip
-
-  MyBucketNotification:
-    Type: AWS::S3::BucketNotification
-    Properties:
-      Bucket: my-s3-bucket-us-east-1-042470866308       # <-- same hard-coded bucket name
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Event: s3:ObjectCreated:Put
-            Function: !GetAtt MyLambdaFunction.Arn
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: inbound/
-    DependsOn: MyLambdaPermission
 
   MyLambdaPermission:
     Type: AWS::Lambda::Permission
@@ -48,4 +33,4 @@ Resources:
       FunctionName: !Ref MyLambdaFunction
       Action: lambda:InvokeFunction
       Principal: s3.amazonaws.com
-      SourceArn: arn:aws:s3:::my-s3-bucket-us-east-1-042470866308
+      SourceArn: !GetAtt MyBucket.Arn
