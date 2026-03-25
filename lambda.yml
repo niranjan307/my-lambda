@@ -5,7 +5,7 @@ Resources:
   MyLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: my-lambda-role-${AWS::Region}
+      RoleName: !Sub my-lambda-role-${AWS::Region}
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -25,13 +25,13 @@ Resources:
       Handler: main.lambda_handler
       Role: !GetAtt MyLambdaRole.Arn
       Code:
-        S3Bucket: my-s3-bucket-${AWS::Region}-${AWS::AccountId}
+        S3Bucket: !Sub my-s3-bucket-${AWS::Region}-${AWS::AccountId}
         S3Key: artifacts/my-lambda.zip
 
   MyBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: my-s3-bucket-${AWS::Region}-${AWS::AccountId}
+      BucketName: !Sub my-s3-bucket-${AWS::Region}-${AWS::AccountId}
       NotificationConfiguration:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:Put
