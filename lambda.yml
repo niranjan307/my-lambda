@@ -15,7 +15,7 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-        - arn:aws:iam::aws:policy/AmazonS3fullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
 
   MyLambdaFunction:
     Type: AWS::Lambda::Function
@@ -32,11 +32,6 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: my-s3-bucket-${AWS::Region}-${AWS::AccountId}
-
-  MyBucketNotification:
-    Type: AWS::S3::BucketNotification
-    Properties:
-      Bucket: !Ref MyBucket
       NotificationConfiguration:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:Put
