@@ -33,4 +33,4 @@ Resources:
       FunctionName: !Ref MyLambdaFunction
       Action: lambda:InvokeFunction
       Principal: s3.amazonaws.com
-      SourceArn: !GetAtt MyBucket.Arn
+      SourceArn: !Sub arn:aws:s3:::my-s3-bucket-${AWS::Region}-${AWS::AccountId}
